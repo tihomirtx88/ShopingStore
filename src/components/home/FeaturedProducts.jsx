@@ -11,7 +11,7 @@ export default async function FeaturedProducts() {
   return (
     <section className="pt-24">
       <SectionTitle text="featured products"/>
-      <ProductsGrid products={products}/>
+      <ProductsGrid products={porducts}/>
     </section>
   );
 }
