@@ -1,13 +1,15 @@
 import React from "react";
 import { fetchAllProducts } from "../../../utils/actions";
 import ProductsGrid from "./ProductsGrid";
-import ProductsList from "./productsList";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { LuLayoutGrid, LuList } from "react-icons/lu";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import ProductsList from "./ProductsList";
 
-export default function ProductsContainer({
+
+
+export default async function ProductsContainer({
   layout,
   search,
 }: {
