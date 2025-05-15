@@ -1,6 +1,6 @@
 import ProductsContainer from "@/components/products/ProductsContainer";
 
-function ProductsPage({searchParams}: {searchParams: {layout?:String, search?:string}}) {
+function ProductsPage({searchParams}: {searchParams: {layout?:string, search?:string}}) {
   const layout = searchParams.layout || 'grid';
   const search = searchParams.search || '';
 
