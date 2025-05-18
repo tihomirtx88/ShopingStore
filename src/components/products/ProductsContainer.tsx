@@ -7,8 +7,6 @@ import { LuLayoutGrid, LuList } from "react-icons/lu";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import ProductsList from "./ProductsList";
 
-
-
 export default async function ProductsContainer({
   layout,
   search,
@@ -16,7 +14,7 @@ export default async function ProductsContainer({
   layout: string;
   search: string;
 }) {
-  const products = await fetchAllProducts();
+  const products = await fetchAllProducts({search});
   const totalProducts = products.length;
   const searchTerm = search ? `&search=${search}` : "";
 
