@@ -1,39 +1,52 @@
-import { redirect } from "next/navigation";
-import db from "./db";
+'use server'; 
+
+import { supabase } from "./supabase";
 
 export const fetchFeaturedProducts = async() => {
-  const products = await db.product.findMany({
-    where: {
-        featured: true
-    }
-  });
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('featured', true);
 
-  return products;
+    console.log(data);
+    
+
+  if (error) {
+   console.log("Featured products fetch - data:", data);
+console.log("Featured products fetch - error:", error);
+    throw new Error('Failed to fetch featured products');
+  }
+
+  return data;
 };
 
-export const fetchAllProducts = ({search=''}:{search:string}) => {
-  const products = db.product.findMany({
-    where: {
-      OR:[
-        {name:{contains: search, mode: 'insensitive'}},
-        {company:{contains: search, mode: 'insensitive'}}
-      ]
-    },
-    orderBy: {
-        createdAt: 'desc'
-    }
-  });
+export const fetchAllProducts = async ({search=''}:{search:string}) => {
+   const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .or(
+      `name.ilike.%${search}%,company.ilike.%${search}%`
+    )
+    .order('createdAt', { ascending: false });
 
-  return products;
+  if (error) {
+    console.error(error);
+    throw new Error('Failed to fetch all products');
+  }
+
+  return data;
 };
 
 export const fetchsingleProduct = async (productId: string) => {
-  const product = await db.product.findUnique({
-    where: {
-      id: productId
-    }
-  });
-  
-  if(!product) redirect('/products');
-  return product;
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('id', productId)
+    .single();
+
+  if (error || !data) {
+    console.error(error || 'No product found');
+  }
+
+  return data;
 };

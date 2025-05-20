@@ -6,9 +6,16 @@ import FavoriteToggleButton from "@/components/products/FavoriteToggleButton";
 import ProductRating from "@/components/single-product/ProductRating";
 import AddtoCart from "@/components/single-product/AddtoCart";
 
-export default async function SingleProductPage({params,}: {params: { id: string };
-}) {
-  const product = await fetchsingleProduct(params.id);
+
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function SingleProductPage({ params }: Props) {
+  const { id } = await params;
+  const product = await fetchsingleProduct(id);
   const { name, company, price, image, description } = product;
   const dollarsAmount = formatCurrency(price);
   return <section>
@@ -23,17 +30,17 @@ export default async function SingleProductPage({params,}: {params: { id: string
           <div className='flex gap-x-8 items-center'>
             <h1 className='capitalize text-3xl font-bold'>{name} </h1>
             <div className='flex items-center gap-x-2'>
-              <FavoriteToggleButton productId={params.id} />
+              <FavoriteToggleButton productId={id} />
               {/* <ShareButton name={product.name} productId={params.id} /> */}
             </div>
           </div>
-          <ProductRating productId={params.id} />
+          <ProductRating productId={id} />
           <h4 className='text-xl mt-2'>{company}</h4>
           <p className='mt-3 text-md bg-muted inline-block p-2 rounded'>
             {dollarsAmount}
           </p>
           <p className='mt-6 leading-8 text-muted-foreground'>{description}</p>
-          <AddtoCart productId={params.id} />
+          <AddtoCart productId={id} />
         </div>
     </div>
   </section>;

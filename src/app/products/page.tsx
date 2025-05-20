@@ -1,11 +1,20 @@
 import ProductsContainer from "@/components/products/ProductsContainer";
+import { fetchAllProducts } from "../../../utils/actions";
 
-function ProductsPage({searchParams}: {searchParams: {layout?:string, search?:string}}) {
-  const layout = searchParams.layout || 'grid';
-  const search = searchParams.search || '';
+type Props = {
+  searchParams: Promise<{ layout?: string; search?: string }>;
+};
+
+export const dynamic = "force-dynamic";
+
+async function ProductsPage({ searchParams }: Props) {
+
+  const { layout = 'grid', search = '' } = await searchParams;
+
+  const products = await fetchAllProducts({ search });
 
     return (
-     <ProductsContainer layout={layout} search={search}/>
+     <ProductsContainer layout={layout} search={search} products={products}/>
     );
   }
   export default ProductsPage;

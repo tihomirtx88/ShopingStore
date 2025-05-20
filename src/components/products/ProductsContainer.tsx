@@ -1,20 +1,34 @@
 import React from "react";
-import { fetchAllProducts } from "../../../utils/actions";
 import ProductsGrid from "./ProductsGrid";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { LuLayoutGrid, LuList } from "react-icons/lu";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import ProductsList from "./ProductsList";
+import { ProductsList } from "./ProductsList";
+
+
+interface Product {
+  id: string;
+  name: string;
+  company: string;
+  price: number;
+  image: string;
+  description?: string;
+  featured?: boolean;
+  createdAt?: string;
+}
+
 
 export default async function ProductsContainer({
   layout,
   search,
+  products
 }: {
   layout: string;
   search: string;
+  products: Product[];
 }) {
-  const products = await fetchAllProducts({search});
+  // const products = await fetchAllProducts({search});
   const totalProducts = products.length;
   const searchTerm = search ? `&search=${search}` : "";
 

@@ -1,11 +1,21 @@
-import { Product } from "@prisma/client";
 import React from "react";
 import { formatCurrency } from "../../../utils/format";
 import Link from "next/link";
 import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 
-export default function ProductsList({products}:{products: Product[]}) {
+interface Product {
+  id: string;
+  name: string;
+  company: string;
+  price: number;
+  image: string;
+  description?: string;
+  featured?: boolean;
+  createdAt?: string;
+}
+
+export function ProductsList({products}:{products: Product[]}) {
   return(
     <div className="mt-12 grid gap-y-8">
       {products.map((product) => {

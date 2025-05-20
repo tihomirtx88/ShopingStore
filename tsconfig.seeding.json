@@ -5,5 +5,4 @@
     "moduleResolution": "node",
     "noEmit": false
   },
-  "include": ["prisma/seed.ts"]
 }
