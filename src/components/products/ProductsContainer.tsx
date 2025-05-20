@@ -4,7 +4,8 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { LuLayoutGrid, LuList } from "react-icons/lu";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { ProductsList } from "./ProductsList";
+import { ProductsListDisplay } from "./ProductsListDisplay";
+
 
 
 interface Product {
@@ -72,7 +73,7 @@ export default async function ProductsContainer({
         ) : layout === "grid" ? (
           <ProductsGrid products={products} />
         ) : (
-          <ProductsList products={products} />
+          <ProductsListDisplay products={products} />
         )}
       </div>
     </>

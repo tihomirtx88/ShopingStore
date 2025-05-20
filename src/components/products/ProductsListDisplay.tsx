@@ -15,7 +15,7 @@ interface Product {
   createdAt?: string;
 }
 
-export function ProductsList({products}:{products: Product[]}) {
+export function ProductsListDisplay({products}:{products: Product[]}) {
   return(
     <div className="mt-12 grid gap-y-8">
       {products.map((product) => {
