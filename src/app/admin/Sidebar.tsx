@@ -18,7 +18,7 @@ export default function Sidebar() {
           <Button
             key={link.href} // ✅ key moved here
             variant={variant} // ✅ changed `value` to `variant`
-            className="w-full mb-2 capitalize font-normal"
+            className="w-full mb-2 capitalize font-normal justify-start"
             asChild
           >
             <Link href={link.href}>{link.label}</Link>
