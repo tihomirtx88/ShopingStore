@@ -10,7 +10,7 @@ export default function SainOutLink() {
   };
   return (
     <SignOutButton>
-      <Link href='/' className="w-full text-left" onClick={handleLogout}>sign out</Link>
+      <Link href='/' className="w-full text-left text-base" onClick={handleLogout}>Sign Out</Link>
     </SignOutButton>
   )
 }
