@@ -58,8 +58,8 @@ export const createProduct = async(formdata:FormData) => {
 
     const newProduct = {
     name: formdata.get("name") as string,
-
   };
 
-
+  console.log(newProduct);
+  
 };
