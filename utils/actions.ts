@@ -1,5 +1,6 @@
 'use server'; 
 
+import { auth } from "@clerk/nextjs/server";
 import { supabase } from "./supabase";
 
 export const fetchFeaturedProducts = async() => {
@@ -49,4 +50,16 @@ export const fetchsingleProduct = async (productId: string) => {
   }
 
   return data;
+};
+
+export const createProduct = async(formdata:FormData) => {
+     const session = await auth();
+   if (!session) throw new Error("You must to logged in!");
+
+    const newProduct = {
+    name: formdata.get("name") as string,
+
+  };
+
+
 };
