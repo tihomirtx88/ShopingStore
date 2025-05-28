@@ -2,8 +2,6 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { supabase } from "./supabase";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export const fetchFeaturedProducts = async () => {
   const { data, error } = await supabase
@@ -49,55 +47,132 @@ export const fetchsingleProduct = async (productId: string) => {
 
 export const createProduct = async (
   prevState: any,
-  formdata: FormData
+  formData: FormData
 ): Promise<{ message: string }> => {
-  const session = await auth();
-  if (!session) throw new Error("You must to logged in!");
+  //  try {
+  //     const name = formData.get('name') as string;
+  //     const company = formData.get('company') as string;
+  //     const description = formData.get('description') as string;
+  //     const featured = formData.get('featured') === 'on';
+  //     const price = Number(formData.get('price'));
 
-  const imageFile = formdata.get("image") as File;
-  let imageUrl = "";
+  //     const imageFile = formData.get('image') as File;
 
-  if (imageFile && imageFile.size > 0) {
-    const fileName = `${Date.now()}-${imageFile.name}`;
+  //     if (!imageFile || !(imageFile instanceof File)) {
+  //       return { message: 'Image upload failed. No file provided.' };
+  //     }
 
-    const { error: uploadError } = await supabase.storage
-      .from("products-images")
-      .upload(`products/${fileName}`, imageFile);
+  //     const imageName = `${Date.now()}-${imageFile.name}`.replace(/\s+/g, '-');
+  //     const imagePath = `products-images/${imageName}`;
 
-    if (uploadError) {
-      console.error("Image upload error:", uploadError.message);
-      throw new Error("Image upload failed.");
+  //     // Upload image to Supabase Storage
+  //     const { error: uploadError } = await supabase.storage
+  //       .from('products-images')
+  //       .upload(imagePath, imageFile);
+
+  //     if (uploadError) {
+  //       console.error(uploadError);
+  //       return { message: 'Image upload failed' };
+  //     }
+
+  //     // Create public image URL
+  //     const { data: publicUrlData } = supabase.storage
+  //       .from('products-images')
+  //       .getPublicUrl(imagePath);
+
+  //     const imageUrl = publicUrlData?.publicUrl;
+
+  //     // Insert into Supabase
+  //     const { error: insertError } = await supabase
+  //       .from('products')
+  //       .insert([
+  //         {
+  //           name,
+  //           company,
+  //           description,
+  //           featured,
+  //           price,
+  //           image: imageUrl,
+  //         },
+  //       ]);
+
+  //     if (insertError) {
+  //       console.error(insertError);
+  //       return { message: 'Product creation failed' };
+  //     }
+
+  //     return { message: 'Product created successfully 🎉' };
+  //   } catch (err) {
+  //     console.error('Unexpected error:', err);
+  //     return { message: 'Something went wrong while creating product.' };
+  //   }
+ try {
+    const { userId } = await auth(); // Get current user's Clerk ID
+    if (!userId) {
+      return { message: 'User not authenticated' };
     }
 
-    const { data: publicUrlData } = supabase.storage
-      .from("products-images")
-      .getPublicUrl(`products/${fileName}`);
+    const name = formData.get('name') as string;
+    const company = formData.get('company') as string;
+    const description = formData.get('description') as string;
+    const featured = formData.get('featured') === 'on';
+    const price = Number(formData.get('price'));
+    const imageFile = formData.get('image') as File | null;
 
-    imageUrl = publicUrlData?.publicUrl ?? "";
+    let imageUrl = '';
+
+    if (imageFile && imageFile instanceof File) {
+      // Generate unique image name and path
+      const imageName = `${Date.now()}-${imageFile.name}`.replace(/\s+/g, '-');
+      const imagePath = `products-images/${imageName}`;
+
+      // Upload image to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('products-images')
+        .upload(imagePath, imageFile);
+
+      if (uploadError) {
+        console.error('Image upload error:', uploadError);
+        return { message: 'Image upload failed' };
+      }
+
+      // Get public URL of the uploaded image
+      const { data: publicUrlData } = supabase.storage
+        .from('products-images')
+        .getPublicUrl(imagePath);
+
+      imageUrl = publicUrlData?.publicUrl ?? '';
+    } else {
+      return { message: 'Image upload failed. No file provided.' };
+    }
+
+    const now = new Date().toISOString();
+
+    // Insert product with image URL and clerkId
+    const { error: insertError } = await supabase
+      .from('products')
+      .insert([
+        {
+          name,
+          company,
+          description,
+          featured,
+          price,
+          image: imageUrl,
+          createdAt: now,
+          updatedAt: now,
+          clerkId: userId,
+        },
+      ]);
+
+    if (insertError) {
+      console.error('Insert error:', insertError);
+      return { message: 'Product creation failed' };
+    }
+
+    return { message: 'Product created successfully 🎉' };
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return { message: 'Something went wrong while creating product.' };
   }
-
-  // Handle image upload if provided
-  const newProduct = {
-    name: formdata.get("name") as string,
-    company: formdata.get("company") as string,
-    price: Number(formdata.get("price") || 0),
-    image: imageUrl,
-    description: formdata.get("description") as string,
-    featured: formdata.get("featured") === "on",
-    user_id: session.user.id,
-  };
-
-  const { error: insertError } = await supabase
-    .from("products")
-    .insert(newProduct);
-
-  if (insertError) {
-    console.error("Insert error:", insertError.message);
-    throw new Error("Failed to create product.");
-  }
-
-  revalidatePath("/products");
-  redirect("/products");
-
-  return { message: "Product created successfully!" };
 };
