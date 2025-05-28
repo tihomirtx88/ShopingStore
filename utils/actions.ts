@@ -46,7 +46,7 @@ export const fetchsingleProduct = async (productId: string) => {
 };
 
 export const createProduct = async (
-  prevState: any,
+  prevState: unknown,
   formData: FormData
 ): Promise<{ message: string }> => {
   //  try {
@@ -107,7 +107,7 @@ export const createProduct = async (
   //     return { message: 'Something went wrong while creating product.' };
   //   }
  try {
-    const { userId } = await auth(); // Get current user's Clerk ID
+    const { userId } = await auth(); 
     if (!userId) {
       return { message: 'User not authenticated' };
     }
@@ -148,7 +148,6 @@ export const createProduct = async (
 
     const now = new Date().toISOString();
 
-    // Insert product with image URL and clerkId
     const { error: insertError } = await supabase
       .from('products')
       .insert([
