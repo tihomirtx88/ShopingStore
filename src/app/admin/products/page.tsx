@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import EmptyList from "@/components/global/EmptyList";
 import { fetchAdminProducts } from "../../../../utils/actions";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
