@@ -108,6 +108,7 @@ export const createProduct = async (
   //   }
  try {
     const { userId } = await auth(); 
+    
     if (!userId) {
       return { message: 'User not authenticated' };
     }
