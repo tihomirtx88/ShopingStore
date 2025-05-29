@@ -1,6 +1,7 @@
-import React from 'react'
 
-export default function ProductPage() {
+
+export default function AdminProductPage() {
+
   return (
     <div>ProductPage</div>
   )
