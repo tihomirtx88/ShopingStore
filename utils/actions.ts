@@ -1,8 +1,21 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { supabase } from "./supabase";
 import { imageSchema, productSchema, validateWithZodSchema } from "./schemas";
+import { redirect } from "next/navigation";
+
+export const getAuthUser = async () => {
+  const user = await currentUser();
+  if(!user) redirect('/');
+  return user;
+};
+
+export const getAdminUser = async ()=> {
+  const user = await getAuthUser();
+  if(user.id !== process.env.ADMIN_USER_ID) redirect('/');
+  return user;
+};
 
 export const fetchFeaturedProducts = async () => {
   const { data, error } = await supabase
@@ -50,63 +63,7 @@ export const createProduct = async (
   prevState: unknown,
   formData: FormData
 ): Promise<{ message: string }> => {
-  //  try {
-  //     const name = formData.get('name') as string;
-  //     const company = formData.get('company') as string;
-  //     const description = formData.get('description') as string;
-  //     const featured = formData.get('featured') === 'on';
-  //     const price = Number(formData.get('price'));
 
-  //     const imageFile = formData.get('image') as File;
-
-  //     if (!imageFile || !(imageFile instanceof File)) {
-  //       return { message: 'Image upload failed. No file provided.' };
-  //     }
-
-  //     const imageName = `${Date.now()}-${imageFile.name}`.replace(/\s+/g, '-');
-  //     const imagePath = `products-images/${imageName}`;
-
-  //     // Upload image to Supabase Storage
-  //     const { error: uploadError } = await supabase.storage
-  //       .from('products-images')
-  //       .upload(imagePath, imageFile);
-
-  //     if (uploadError) {
-  //       console.error(uploadError);
-  //       return { message: 'Image upload failed' };
-  //     }
-
-  //     // Create public image URL
-  //     const { data: publicUrlData } = supabase.storage
-  //       .from('products-images')
-  //       .getPublicUrl(imagePath);
-
-  //     const imageUrl = publicUrlData?.publicUrl;
-
-  //     // Insert into Supabase
-  //     const { error: insertError } = await supabase
-  //       .from('products')
-  //       .insert([
-  //         {
-  //           name,
-  //           company,
-  //           description,
-  //           featured,
-  //           price,
-  //           image: imageUrl,
-  //         },
-  //       ]);
-
-  //     if (insertError) {
-  //       console.error(insertError);
-  //       return { message: 'Product creation failed' };
-  //     }
-
-  //     return { message: 'Product created successfully 🎉' };
-  //   } catch (err) {
-  //     console.error('Unexpected error:', err);
-  //     return { message: 'Something went wrong while creating product.' };
-  //   }
  try {
     const { userId } = await auth(); 
     
@@ -165,11 +122,32 @@ export const createProduct = async (
       console.error("Insert error:", insertError);
       return { message: "Product creation failed" };
     }
-
-    return { message: "Product created successfully 🎉" };
-    
   } catch (err) {
     console.error('Unexpected error:', err);
     return { message: 'Something went wrong while creating product.' };
   }
+  redirect("/admin/products");
+};
+
+export const fetchAdminProducts = async () => {
+ try {
+    const adminUser = await getAdminUser();
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("clerkId", adminUser.id)
+      .order("createdAt", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching admin products:", error);
+      throw new Error("Failed to fetch admin products");
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Unexpected error in fetchAdminProducts:", err);
+    throw new Error("Server error while fetching admin products");
+  }
+
 };
