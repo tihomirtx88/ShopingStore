@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { supabase } from "./supabase";
 import { imageSchema, productSchema, validateWithZodSchema } from "./schemas";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export const getAuthUser = async () => {
   const user = await currentUser();
@@ -127,6 +128,56 @@ export const createProduct = async (
     return { message: 'Something went wrong while creating product.' };
   }
   redirect("/admin/products");
+};
+
+export const deleteProduct = async (productId: string) => {
+  try {
+
+    const user = await getAuthUser();
+
+    let isAdmin = false;
+    try {
+      await getAdminUser(); 
+      isAdmin = true;
+    } catch {
+      isAdmin = false;
+    }
+
+    const { data: product, error } = await supabase
+      .from("products")
+      .select("clerkId")
+      .eq("id", productId)
+      .single();
+
+    if (error || !product) {
+      console.error("Product not found or fetch error", error);
+      throw new Error("Product not found");
+    }
+
+    
+    const isOwner = product.clerkId === user.id;
+
+    if (!isAdmin && !isOwner) {
+      throw new Error("Unauthorized to delete this product");
+    }
+
+
+    const { error: deleteError } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", productId);
+
+    revalidatePath("/admin/products");
+
+    if (deleteError) {
+      console.error("Delete error:", deleteError);
+      throw new Error("Failed to delete product");
+    }
+
+  } catch (error) {
+    console.error("Unexpected error in deleteProduct:", error);
+    throw new Error("Error deleting product");
+  }
 };
 
 export const fetchAdminProducts = async () => {
