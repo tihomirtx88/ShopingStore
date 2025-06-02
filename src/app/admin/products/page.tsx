@@ -1,3 +1,5 @@
+
+
 export const dynamic = "force-dynamic";
 
 import EmptyList from "@/components/global/EmptyList";
@@ -5,6 +7,8 @@ import { fetchAdminProducts } from "../../../../utils/actions";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { formatCurrency } from "../../../../utils/format";
+import { IconButton } from "@/components/form/Buttons";
+import DeleteProduct from "@/components/form/DeleteProduct";
 
 
 export default async function AdminProductPage() {
@@ -42,8 +46,9 @@ export default async function AdminProductPage() {
                 <TableCell>{formatCurrency(price)}</TableCell>
                 <TableCell className='flex items-center gap-x-2'>
                   <Link href={`/admin/products/${productId}/edit`}>
-                  Edit
+                    <IconButton actionType="edit"/>
                   </Link>
+                  <DeleteProduct productId={productId}/>
                 </TableCell>
               </TableRow>
             );
@@ -53,3 +58,4 @@ export default async function AdminProductPage() {
     </section>
   )
 }
+
