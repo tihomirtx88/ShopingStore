@@ -6,7 +6,13 @@ import PriceInput from '@/components/form/PriceInput';
 import TextArea from '@/components/form/TextArea';
 import CheckBox from '@/components/form/CheckBox';
 
-export default async function EditProductPage({params}: {params: {id: string}}) {
+type EditProductPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function EditProductPage({ params }: EditProductPageProps) {
   const { id } = params;
   const product = await fetchAdminProductDetails(id);
   const { name, company, description, featured, price} = product;
