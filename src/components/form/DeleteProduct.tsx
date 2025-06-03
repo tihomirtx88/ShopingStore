@@ -19,7 +19,11 @@ export default function DeleteProduct({productId}:{productId: string}){
       }
     });
   };
-  return <button onClick={handleDelete} disabled={isPending}>
-  <IconButton actionType="delete" />
-</button>
+  return (
+     <IconButton
+      actionType="delete"
+      onClick={handleDelete}
+      disabled={isPending}
+    />
+  )
 };
