@@ -38,23 +38,35 @@ export default function Buttons({className = '', text = 'submit', size = 'lg',
 
 type ActionType = 'edit' | 'delete';
 
-export const IconButton = ({actionType}: {actionType: ActionType}) => {
-  const { pending } = useFormStatus();
-
-  const rednerIcon = () => {
-     switch (actionType) {
-      case 'edit':
-        return <LuSquare/>
-      case 'delete':
-        return <LuTrash2/>
+export const IconButton = ({
+  actionType,
+  onClick,
+  disabled,
+}: {
+  actionType: ActionType;
+  onClick?: () => void;
+  disabled?: boolean;
+}) => {
+  const renderIcon = () => {
+    switch (actionType) {
+      case "edit":
+        return <LuSquare />;
+      case "delete":
+        return <LuTrash2 />;
       default:
-        const never:never = actionType;
-        throw new Error(`Invalid action type: ${never}`);
-     }
+        const _exhaustiveCheck: never = actionType;
+        throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
+    }
   };
 
-  return <Button type='submit' size='icon' variant='link' className='p-2 cursor-pointer'>
-    {pending ? <ReloadIcon className='animate-spin'/> : rednerIcon()
-    }
-  </Button>
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="p-2 rounded hover:bg-muted transition"
+    >
+      {renderIcon()}
+    </button>
+  );
 };
