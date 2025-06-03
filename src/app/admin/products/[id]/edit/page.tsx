@@ -6,14 +6,15 @@ import PriceInput from '@/components/form/PriceInput';
 import TextArea from '@/components/form/TextArea';
 import CheckBox from '@/components/form/CheckBox';
 
-type EditProductPageProps = {
-  params: {
-    id: string;
-  };
+
+type Props = {
+  params: Promise<{ id: string }>;
 };
 
-export default async function EditProductPage({ params }: EditProductPageProps) {
-  const { id } = params;
+export const dynamic = "force-dynamic";
+
+export default async function EditProductPage({ params }: Props) {
+  const { id } = await params;
   const product = await fetchAdminProductDetails(id);
   const { name, company, description, featured, price} = product;
   return (
