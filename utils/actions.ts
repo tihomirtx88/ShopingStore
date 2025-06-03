@@ -204,3 +204,33 @@ export const fetchAdminProducts = async () => {
   }
 
 };
+
+export const fetchAdminProductDetails = async (productId: string) => {
+    const user = await getAuthUser();
+
+  let isAdmin = false;
+  try {
+    await getAdminUser();
+    isAdmin = true;
+  } catch {
+    isAdmin = false;
+  }
+
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", productId)
+    .single();
+
+  if (error || !product) {
+    console.error("Product not found or fetch error", error);
+    redirect("/admin/products"); 
+  }
+
+  const isOwner = product.clerkId === user.id;
+  if (!isAdmin && !isOwner) {
+    redirect("/"); 
+  }
+
+  return product;
+};
