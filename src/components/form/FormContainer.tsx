@@ -19,5 +19,5 @@ const [state, formAction] = useActionState(action, initialState);
     }
   }, [state]);
 
-  return <form action={formAction} encType="multipart/form-data">{children}</form>;
+  return <form action={formAction}>{children}</form>;
 }
