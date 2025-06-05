@@ -2,7 +2,7 @@ import React from "react";
 import { FaStar } from "react-icons/fa";
 
 export default function ProductRating({productId}: {productId: string}) {
-  console.log(productId);
+
   
   //temp
   const rating = 4.2;

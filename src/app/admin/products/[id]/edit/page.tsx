@@ -1,10 +1,12 @@
 import React from 'react'
-import { fetchAdminProductDetails, updateProductAction } from '../../../../../../utils/actions';
+import { fetchAdminProductDetails, updateImageAction, updateProductAction } from '../../../../../../utils/actions';
 import FormContainer from '@/components/form/FormContainer';
 import FormInput from '@/components/form/FormInput';
 import PriceInput from '@/components/form/PriceInput';
 import TextArea from '@/components/form/TextArea';
 import CheckBox from '@/components/form/CheckBox';
+import Buttons from '@/components/form/Buttons';
+import ImageInputContainer from '@/components/form/ImageInputContainer';
 
 
 type Props = {
@@ -22,6 +24,10 @@ export default async function EditProductPage({ params }: Props) {
       <h1 className='text-2xl font-semibold mb-8 capitalize'>Update Product</h1>
       <div className='border rounded p-8'>
         {/* Image input container */}
+        <ImageInputContainer name={name} image={product.image} text='update image' action={updateImageAction}>
+          <input type="hidden" name='id' value={id} />
+          <input type="hidden" name='url' value={product.image} />
+        </ImageInputContainer>
         <FormContainer 
         action={updateProductAction}
         >
@@ -35,7 +41,7 @@ export default async function EditProductPage({ params }: Props) {
         <div className='mt-6'>
            <CheckBox name='featured' label='featured' defaultChecked={featured}/>
         </div>
-        {/* <SubmitButton text='update product' className='mt-8 '/> */}
+        <Buttons text='update product' className='mt-8 '/>
         </FormContainer>
       </div>
     </section>
