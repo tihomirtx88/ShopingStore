@@ -389,25 +389,28 @@ export const updateProductAction = async (
   }
 };
 
-export const toggleFavoriteIcon = async () => {
+export const toggleFavoriteAction = async () => {
   return {message: 'Favorite toogle action'}
 };
 
 export const fetchFavroiteId = async ({productId}: {productId:string}) => {
-  try {
+ try {
+    const user = await getAuthUser(); 
+
     const { data, error } = await supabase
-      .from("Favorite")
+      .from("Favorite") 
       .select("id, clerkId, productId, createdAt, updatedAt")
-      .eq("productId", productId);
+      .eq("productId", productId)
+      .eq("clerkId", user.id); 
 
     if (error) {
-      console.error("Error fetching favorites:", error);
-      throw new Error("Failed to fetch favorites for product");
+      console.error("Error fetching favorite:", error);
+      throw new Error("Failed to fetch favorite for user and product");
     }
 
-    return data;
+    return data; 
   } catch (error) {
     console.error("Unexpected error in fetchFavoriteId:", error);
-    throw new Error("Server error while fetching favorites");
+    throw new Error("Server error while fetching favorite");
   }
 };
