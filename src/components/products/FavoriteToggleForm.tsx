@@ -12,10 +12,13 @@ type FavoritetoogleFormProps = {
 
 export default function FavoriteToggleForm({productId, favoriteId}:FavoritetoogleFormProps) {
   const pathName = usePathname();
-  const toogleAvtion = toggleFavoriteAction.bind(null, {productId, favoriteId, pathName});
+
   return (
-    <FormContainer action={toogleAvtion}>
-      <CardSubmitbutton isFavorite={favoriteId? true:false}/>
+   <FormContainer action={toggleFavoriteAction}>
+      <input type="hidden" name="productId" value={productId} />
+      <input type="hidden" name="favoriteId" value={favoriteId ?? ""} />
+      <input type="hidden" name="pathName" value={pathName} />
+      <CardSubmitbutton isFavorite={!!favoriteId} />
     </FormContainer>
   );
 }

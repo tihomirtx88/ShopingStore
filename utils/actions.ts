@@ -389,8 +389,47 @@ export const updateProductAction = async (
   }
 };
 
-export const toggleFavoriteAction = async () => {
-  return {message: 'Favorite toogle action'}
+export const toggleFavoriteAction = async (  prevState: unknown, formData: FormData) => {
+  const productId = formData.get("productId") as string;
+  const favoriteId = formData.get("favoriteId") as string;
+  const pathName = formData.get("pathName") as string;
+
+  const { userId } = await auth();
+  if (!userId) return { message: "Not authenticated" };
+
+  try {
+    if (favoriteId) {
+      const { error } = await supabase
+        .from("Favorite")
+        .delete()
+        .eq("id", favoriteId);
+
+      if (error) throw new Error("Delete failed");
+
+      revalidatePath(pathName);
+      return { message: "Removed from favorites" };
+
+    } else {
+      const now = new Date().toISOString();
+
+      const { error } = await supabase.from("Favorite").insert([
+        {
+          productId,
+          clerkId: userId,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
+
+      if (error) throw new Error("Insert failed");
+
+      revalidatePath(pathName);
+      return { message: "Added to favorites" };
+    }
+  } catch (err) {
+    console.error("toggleFavoriteAction error:", err);
+    return { message: "Server error" };
+  }
 };
 
 export const fetchFavroiteId = async ({productId}: {productId:string}) => {
