@@ -5,6 +5,8 @@ import { useFormStatus } from 'react-dom';
 import { LuTrash2, LuSquare } from 'react-icons/lu';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { SignInButton } from '@clerk/nextjs';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 type btnSize = 'lg' | 'default' | 'sm';
 
@@ -68,5 +70,24 @@ export const IconButton = ({
     >
       {renderIcon()}
     </button>
+  );
+};
+
+export const CardSignInbutton = () =>{
+  return <SignInButton mode='modal'>
+    <Button type='submit' size='icon' variant='outline' className='p-2 cursor-pointer' asChild>
+      <FaRegHeart/>
+    </Button>
+  </SignInButton>
+};
+
+export const CardSubmitbutton = ({isFavorite}: {isFavorite: boolean}) => {
+  const { pending } = useFormStatus();
+  return(
+    <Button type='submit' size='icon' variant='outline' className='p-2 cursor-pointer' asChild>
+      {pending ? <ReloadIcon className='animate-spin'/> : isFavorite
+                                                        ? <FaHeart/>
+                                                        : <FaRegHeart/> }
+    </Button>
   );
 };

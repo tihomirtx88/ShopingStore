@@ -279,6 +279,9 @@ export const updateImageAction = async (
         cacheControl: "3600",
         upsert: true,
     });
+
+    console.log(uploadData);
+    
     
     
     if (uploadError) {
@@ -383,5 +386,28 @@ export const updateProductAction = async (
   } catch (error) {
     console.error("Unexpected error in updateProductAction:", error);
     return { message: "Unexpected error occurred" };
+  }
+};
+
+export const toggleFavoriteIcon = async () => {
+  return {message: 'Favorite toogle action'}
+};
+
+export const fetchFavroiteId = async ({productId}: {productId:string}) => {
+  try {
+    const { data, error } = await supabase
+      .from("Favorite")
+      .select("id, clerkId, productId, createdAt, updatedAt")
+      .eq("productId", productId);
+
+    if (error) {
+      console.error("Error fetching favorites:", error);
+      throw new Error("Failed to fetch favorites for product");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Unexpected error in fetchFavoriteId:", error);
+    throw new Error("Server error while fetching favorites");
   }
 };
