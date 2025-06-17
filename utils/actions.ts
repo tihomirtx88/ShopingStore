@@ -19,7 +19,7 @@ export const getAdminUser = async () => {
 };
 
 export const fetchFeaturedProducts = async () => {
-    const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -33,7 +33,7 @@ export const fetchFeaturedProducts = async () => {
 };
 
 export const fetchAllProducts = async ({ search = "" }: { search: string }) => {
-    const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -49,7 +49,7 @@ export const fetchAllProducts = async ({ search = "" }: { search: string }) => {
 };
 
 export const fetchsingleProduct = async (productId: string) => {
-    const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -92,7 +92,7 @@ export const createProduct = async (
     const imagePath = `products-images/${imageName}`;
 
     // Upload image
-      const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { error: uploadError } = await supabase.storage
       .from("products-images")
       .upload(imagePath, imageFile);
@@ -144,7 +144,7 @@ export const deleteProduct = async (productId: string) => {
     } catch {
       isAdmin = false;
     }
-      const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: product, error } = await supabase
       .from("products")
       .select("clerkId")
@@ -184,7 +184,7 @@ export const deleteProduct = async (productId: string) => {
 export const fetchAdminProducts = async () => {
   try {
     const adminUser = await getAdminUser();
-      const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -213,7 +213,7 @@ export const fetchAdminProductDetails = async (productId: string) => {
   } catch {
     isAdmin = false;
   }
-    const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: product, error } = await supabase
     .from("products")
     .select("*")
@@ -240,8 +240,6 @@ export const updateImageAction = async (
   const id = formData.get("id") as string;
   const file = formData.get("image") as File;
 
-  
-
   if (!id || !file) {
     return { message: "Missing product ID or file" };
   }
@@ -256,7 +254,7 @@ export const updateImageAction = async (
     } catch {
       isAdmin = false;
     }
-      const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: product, error } = await supabase
       .from("products")
       .select("clerkId")
@@ -282,12 +280,10 @@ export const updateImageAction = async (
       .upload(filePath, file, {
         cacheControl: "3600",
         upsert: true,
-    });
+      });
 
     console.log(uploadData);
-    
-    
-    
+
     if (uploadError) {
       console.error("Upload error", uploadError.message);
       return { message: "Image upload failed" };
@@ -323,7 +319,6 @@ export const updateImageAction = async (
   }
 };
 
-
 export const updateProductAction = async (
   prevState: unknown,
   formData: FormData
@@ -344,7 +339,10 @@ export const updateProductAction = async (
       price: Number(formEntries.price),
     };
 
-    const validatedFields = validateWithZodSchema(productSchema, validatedInput);
+    const validatedFields = validateWithZodSchema(
+      productSchema,
+      validatedInput
+    );
     // Auth
     const user = await getAuthUser();
 
@@ -355,7 +353,7 @@ export const updateProductAction = async (
     } catch {
       isAdmin = false;
     }
-      const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: product, error } = await supabase
       .from("products")
       .select("clerkid")
@@ -386,28 +384,33 @@ export const updateProductAction = async (
     revalidatePath("/admin/products");
 
     return { message: "Product updated successfully" };
-   
   } catch (error) {
     console.error("Unexpected error in updateProductAction:", error);
     return { message: "Unexpected error occurred" };
   }
 };
 
-export const toggleFavoriteAction = async (  prevState: unknown, formData: FormData) => {
-   const productid = formData.get("productId") as string;
+export const toggleFavoriteAction = async (
+  prevState: unknown,
+  formData: FormData
+) => {
+  const productid = formData.get("productId") as string;
   const favoriteId = formData.get("favoriteId") as string;
   const pathName = formData.get("pathName") as string;
-    const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   const { userId } = await auth();
 
-  console.log('userId from Clerk:', userId);
- 
+  console.log("userId from Clerk:", userId);
+
   if (!userId) return { message: "Not authenticated" };
 
   try {
     if (favoriteId) {
-      const { error } = await supabase.from("Favorite").delete().eq("id", favoriteId);
+      const { error } = await supabase
+        .from("Favorite")
+        .delete()
+        .eq("id", favoriteId);
       if (error) throw new Error("Delete failed");
 
       revalidatePath(pathName);
@@ -422,9 +425,6 @@ export const toggleFavoriteAction = async (  prevState: unknown, formData: FormD
           updated_at: now,
         },
       ]);
-      
-      console.log(error);
-      
 
       if (error) throw new Error("Insert failed");
 
@@ -437,24 +437,46 @@ export const toggleFavoriteAction = async (  prevState: unknown, formData: FormD
   }
 };
 
-export const fetchFavroiteId = async ({productId}: {productId:string}) => {
-   try {
+export const fetchFavroiteId = async ({ productId }: { productId: string }) => {
+  try {
     const user = await getAuthUser();
-      const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from("Favorite")
-     .select("id, clerkid, productid, created_at, updated_at")
-   .eq("productid", productId)
+      .select("id, clerkid, productid, created_at, updated_at")
+      .eq("productid", productId)
       .eq("clerkid", user.id);
 
     if (error) {
-      console.error("Supabase error object:", JSON.stringify(error, null, 2)); 
+      console.error("Supabase error object:", JSON.stringify(error, null, 2));
       throw new Error("Failed to fetch favorite for user and product");
     }
 
     return data?.[0] ?? null;
   } catch (error) {
     console.error("Unexpected error in fetchFavoriteId:", error);
+    throw new Error("Server error while fetching favorite");
+  }
+};
+
+export const fetchUserFavroite = async () => {
+  try {
+    const user = await getAuthUser();
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("Favorite")
+      .select("id, clerkid, created_at, updated_at, productid(*)") 
+      .eq("clerkid", user.id);
+
+
+    if (error) {
+      console.error("Supabase error object:", JSON.stringify(error, null, 2));
+      throw new Error("Failed to fetch favorite for user and product");
+    }
+
+    return data;
+  } catch (error) {
+     console.error("Unexpected error in fetchFavoriteId:", error);
     throw new Error("Server error while fetching favorite");
   }
 };
