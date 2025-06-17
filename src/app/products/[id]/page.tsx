@@ -5,6 +5,7 @@ import Image from "next/image";
 import FavoriteToggleButton from "@/components/products/FavoriteToggleButton";
 import ProductRating from "@/components/single-product/ProductRating";
 import AddtoCart from "@/components/single-product/AddtoCart";
+import ShareButton from "@/components/single-product/ShareButton";
 
 
 type Props = {
@@ -13,8 +14,8 @@ type Props = {
 
 export const dynamic = "force-dynamic";
 
-export default async function SingleProductPage({ params }: Props) {
-  const { id } = await params;
+export default async function SingleProductPage(props: Props) {
+  const { id } = await props.params;
   const product = await fetchsingleProduct(id);
   const { name, company, price, image, description } = product;
   const dollarsAmount = formatCurrency(price);
@@ -31,7 +32,7 @@ export default async function SingleProductPage({ params }: Props) {
             <h1 className='capitalize text-3xl font-bold'>{name} </h1>
             <div className='flex items-center gap-x-2'>
               <FavoriteToggleButton productId={id} />
-              {/* <ShareButton name={product.name} productId={params.id} /> */}
+              <ShareButton name={product.name} productId={id}/>
             </div>
           </div>
           <ProductRating productId={id} />
