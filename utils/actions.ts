@@ -133,6 +133,33 @@ export const createProduct = async (
   redirect("/admin/products");
 };
 
+export const createReview = async (
+  prevState: unknown,
+  formData: FormData
+): Promise<{ message: string }> => {
+   return {message: 'review is created'};
+};
+
+export const fetchProductReviews = async () => {
+
+};
+
+export const fetchProductReviewsByUser = async ({ productId }: { productId: string }) => {
+  
+};
+
+export const deleteProductReviews = async (productId: string) => {
+
+};
+
+export const findExistingReview = async (productId: string) => {
+
+};
+
+export const fetchProductRating = async (productId: string) => {
+
+};
+
 export const deleteProduct = async (productId: string) => {
   try {
     const user = await getAuthUser();
