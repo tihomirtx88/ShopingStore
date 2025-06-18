@@ -1,10 +1,16 @@
 "use server";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { imageSchema, productSchema, validateWithZodSchema } from "./schemas";
+import {
+  imageSchema,
+  productSchema,
+  reviewSchema,
+  validateWithZodSchema,
+} from "./schemas";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "./supabase-server";
+import { ZodError } from "zod";
 
 export const getAuthUser = async () => {
   const user = await currentUser();
@@ -137,28 +143,74 @@ export const createReview = async (
   prevState: unknown,
   formData: FormData
 ): Promise<{ message: string }> => {
-   return {message: 'review is created'};
-};
+  const supabase = await createSupabaseServerClient();
+  const { userId } = await auth();
+  const userr = await getAuthUser();
 
-export const fetchProductReviews = async () => {
+   const rawData = {
+      productid: formData.get("productId"),
+      authorname: formData.get("authorName") || userr.firstName || "user",
+      authorimageurl: formData.get("authorImageUrl") || userr.imageUrl || "",
+      rating: formData.get("rating"),
+      comment: formData.get("comment"),
+      clerkid: userId,
+    };
 
-};
+    const parsed = reviewSchema.parse(rawData);
 
-export const fetchProductReviewsByUser = async ({ productId }: { productId: string }) => {
   
+  if (!userId) return { message: "Not authenticated" };
+  try {
+     const now = new Date().toISOString();
+   
+    const { error } = await supabase.from("Review").insert({
+      productid: parsed.productid,
+      authorname: parsed.authorname,
+      authorimageurl: parsed.authorimageurl,
+      rating: parsed.rating,
+      comment: parsed.comment,
+      updatedat: now,
+      clerkid: parsed.clerkid,
+    });
+
+    if (error) {
+      console.error("Supabase error:", error.message);
+      console.log(error.message);
+
+      return { message: "Failed to submit review. Please try again." };
+    }
+
+    return { message: "Review submitted successfully!" };
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      console.error("Validation error:", error.errors);
+      return { message: error.errors[0]?.message || "Invalid input" };
+    }
+
+    if (error instanceof Error) {
+      console.error("Unexpected error:", error.message);
+      return { message: "Something went wrong while submitting your review." };
+    }
+
+    // fallback for truly unknown errors
+    console.error("Unknown error:", error);
+    return { message: "An unknown error occurred." };
+  }
 };
 
-export const deleteProductReviews = async (productId: string) => {
+export const fetchProductReviews = async () => {};
 
-};
+export const fetchProductReviewsByUser = async ({
+  productId,
+}: {
+  productId: string;
+}) => {};
 
-export const findExistingReview = async (productId: string) => {
+export const deleteProductReviews = async (productId: string) => {};
 
-};
+export const findExistingReview = async (productId: string) => {};
 
-export const fetchProductRating = async (productId: string) => {
-
-};
+export const fetchProductRating = async (productId: string) => {};
 
 export const deleteProduct = async (productId: string) => {
   try {
@@ -428,8 +480,6 @@ export const toggleFavoriteAction = async (
 
   const { userId } = await auth();
 
-  console.log("userId from Clerk:", userId);
-
   if (!userId) return { message: "Not authenticated" };
 
   try {
@@ -492,9 +542,8 @@ export const fetchUserFavroite = async () => {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from("Favorite")
-      .select("id, clerkid, created_at, updated_at, productid(*)") 
+      .select("id, clerkid, created_at, updated_at, productid(*)")
       .eq("clerkid", user.id);
-
 
     if (error) {
       console.error("Supabase error object:", JSON.stringify(error, null, 2));
@@ -503,7 +552,7 @@ export const fetchUserFavroite = async () => {
 
     return data;
   } catch (error) {
-     console.error("Unexpected error in fetchFavoriteId:", error);
+    console.error("Unexpected error in fetchFavoriteId:", error);
     throw new Error("Server error while fetching favorite");
   }
 };
