@@ -2,8 +2,8 @@ import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type RatingInputProps = {
-  name: string;
-  labelText: string;
+  name?: string;
+  labelText?: string;
 };
 
 export default function RatingInput({ name, labelText }: RatingInputProps) {
