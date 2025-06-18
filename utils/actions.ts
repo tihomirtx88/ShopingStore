@@ -231,7 +231,31 @@ export const deleteProductReviews = async (productId: string) => {};
 
 export const findExistingReview = async (productId: string) => {};
 
-export const fetchProductRating = async (productId: string) => {};
+export const fetchProductRating = async (productId: string) => {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("Review")
+    .select("rating")
+    .eq("productid", productId);
+
+  if (error) {
+    console.error("Error fetching product ratings:", error.message);
+    return { averageRating: 0, totalRatings: 0 };
+  }
+
+  const ratings = data.map((review) => review.rating as number);
+  const totalRatings = ratings.length;
+  const averageRating =
+    totalRatings > 0
+      ? ratings.reduce((acc, curr) => acc + curr, 0) / totalRatings
+      : 0;
+
+  return {
+    averageRating: Number(averageRating.toFixed(1)),
+    totalRatings,
+  };
+};
 
 export const deleteProduct = async (productId: string) => {
   try {
