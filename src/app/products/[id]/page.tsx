@@ -7,6 +7,7 @@ import ProductRating from "@/components/single-product/ProductRating";
 import AddtoCart from "@/components/single-product/AddtoCart";
 import ShareButton from "@/components/single-product/ShareButton";
 import SubmitReview from "@/components/reviews/SubmitReview";
+import ProductReviews from "@/components/reviews/ProductReviews";
 // import ProductReviews from "@/components/reviews/ProductReviews";
 
 
@@ -47,7 +48,7 @@ export default async function SingleProductPage(props: Props) {
           <AddtoCart productId={id} />
         </div>
     </div>
-    {/* <ProductReviews productId={id}/> */}
+    <ProductReviews productId={id}/>
     <SubmitReview productId={id}/>
   </section>;
 }

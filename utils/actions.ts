@@ -198,7 +198,28 @@ export const createReview = async (
   }
 };
 
-export const fetchProductReviews = async () => {};
+export const fetchProductReviews = async (productId: string) => {
+ try {
+    const user = await getAuthUser();
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("Review")
+      .select("id, rating, comment, authorname, authorimageurl, createdat, clerkid,updatedat")
+      .eq("productid", productId)
+      .eq("clerkid", user.id);
+
+    if (error) {
+      console.error("Supabase error object:", JSON.stringify(error, null, 2));
+      throw new Error("Failed to fetch favorite for user and product");
+    }
+    
+    return data ?? [];
+  } catch (error) {
+    console.error("Unexpected error in fetchFavoriteId:", error);
+    throw new Error("Server error while fetching favorite");
+  }
+
+};
 
 export const fetchProductReviewsByUser = async ({
   productId,
