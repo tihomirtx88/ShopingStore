@@ -9,7 +9,10 @@ const nextConfig: NextConfig = {
         hostname: 'images.pexels.com',
       },
     ],
-    domains: ['pkhrcwdgwgoenfdvbicg.supabase.co'],  
+     domains: [
+      'pkhrcwdgwgoenfdvbicg.supabase.co',
+      'img.clerk.com', 
+    ], 
   },
 };
 
