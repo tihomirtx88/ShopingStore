@@ -3,8 +3,9 @@ import ProductsGrid from "./ProductsGrid";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { LuLayoutGrid, LuList } from "react-icons/lu";
-import { Separator } from "@radix-ui/react-dropdown-menu";
+
 import { ProductsListDisplay } from "./ProductsListDisplay";
+import SeparatorWrapper from "../reviews/SeparatorWrapper";
 
 
 
@@ -62,7 +63,7 @@ export default async function ProductsContainer({
               </Link>
             </Button>
         </div>
-        <Separator className="mt-4"/>
+        <SeparatorWrapper/>
       </section>
       {/* Products */}
       <div>

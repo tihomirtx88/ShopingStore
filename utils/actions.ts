@@ -262,14 +262,16 @@ export const fetchProductReviewsByUser = async () => {
 
 export const deleteProductReviews = async (reviewId: string) => {
   try {
-    const user = await getAuthUser();
     const supabase = await createSupabaseServerClient();
+    const user = await getAuthUser();
+    console.log("Current user from Clerk:", user.id);
 
     const { data: existingReview, error: fetchError } = await supabase
       .from("Review")
       .select("id, clerkid")
       .eq("id", reviewId)
       .single();
+    console.log("Review clerkid:", existingReview?.clerkid);
 
     if (fetchError) {
       console.error(
@@ -297,7 +299,7 @@ export const deleteProductReviews = async (reviewId: string) => {
       throw new Error("Failed to delete review");
     }
 
-    return { success: true };
+    return { message: "Review deleted successfully" }; 
   } catch (error) {
     console.error("Unexpected error in deleteProductReviews:", error);
     throw new Error("Server error while deleting review");

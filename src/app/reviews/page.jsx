@@ -5,7 +5,6 @@ import DeleteReview from "@/components/reviews/DeleteReview";
 
 async function ReviewsPage() {
   const reviews = await fetchProductReviewsByUser();
-  console.log(reviews, "from reviews page");
 
   if (reviews.length === 0) {
     return <SectionTitle text="you have no reviews yet" />;
