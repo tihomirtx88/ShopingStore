@@ -14,7 +14,7 @@ import { ZodError } from "zod";
 
 export const getAuthUser = async () => {
   const user = await currentUser();
-  if (!user) redirect("/");
+  if (!user) throw new Error("Not authenticated"); 
   return user;
 };
 
@@ -199,24 +199,22 @@ export const createReview = async (
 };
 
 export const fetchProductReviews = async (productId: string) => {
- try {
-    const user = await getAuthUser();
+  try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from("Review")
       .select("id, rating, comment, authorname, authorimageurl, createdat, clerkid,updatedat")
-      .eq("productid", productId)
-      .eq("clerkid", user.id);
+      .eq("productid", productId);
 
     if (error) {
       console.error("Supabase error object:", JSON.stringify(error, null, 2));
-      throw new Error("Failed to fetch favorite for user and product");
+      throw new Error("Failed to fetch reviews");
     }
-    
+
     return data ?? [];
   } catch (error) {
-    console.error("Unexpected error in fetchFavoriteId:", error);
-    throw new Error("Server error while fetching favorite");
+    console.error("Unexpected error in fetchProductReviews:", error);
+    throw new Error("Server error while fetching reviews");
   }
 
 };
@@ -225,7 +223,29 @@ export const fetchProductReviewsByUser = async ({
   productId,
 }: {
   productId: string;
-}) => {};
+}) => {
+   try {
+
+    const user = await getAuthUser(); 
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error } = await supabase
+      .from("Review")
+      .select("id, rating, comment, authorname, authorimageurl, createdat, updatedat, clerkid")
+      .eq("productid", productId)
+      .eq("clerkid", user.id); 
+
+    if (error) {
+      console.error("Supabase error object:", JSON.stringify(error, null, 2));
+      throw new Error("Failed to fetch user-specific reviews");
+    }
+
+    return data ?? [];
+  } catch (error) {
+    console.error("Unexpected error in fetchProductReviewsByUser:", error);
+    throw new Error("Server error while fetching user reviews");
+  }
+};
 
 export const deleteProductReviews = async (productId: string) => {};
 

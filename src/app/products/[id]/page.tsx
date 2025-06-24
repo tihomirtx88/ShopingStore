@@ -8,6 +8,7 @@ import AddtoCart from "@/components/single-product/AddtoCart";
 import ShareButton from "@/components/single-product/ShareButton";
 import SubmitReview from "@/components/reviews/SubmitReview";
 import ProductReviews from "@/components/reviews/ProductReviews";
+import { auth } from "@clerk/nextjs/server";
 // import ProductReviews from "@/components/reviews/ProductReviews";
 
 
@@ -22,6 +23,8 @@ export default async function SingleProductPage(props: Props) {
   const product = await fetchsingleProduct(id);
   const { name, company, price, image, description } = product;
   const dollarsAmount = formatCurrency(price);
+
+    const { userId } = auth();
 
   return <section>
     <BreadCrumbps name={product.name}/>
@@ -49,6 +52,6 @@ export default async function SingleProductPage(props: Props) {
         </div>
     </div>
     <ProductReviews productId={id}/>
-    <SubmitReview productId={id}/>
+    {userId && <SubmitReview productId={id} />}
   </section>;
 }
