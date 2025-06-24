@@ -14,7 +14,7 @@ import { ZodError } from "zod";
 
 export const getAuthUser = async () => {
   const user = await currentUser();
-  if (!user) throw new Error("Not authenticated"); 
+  if (!user) throw new Error("Not authenticated");
   return user;
 };
 
@@ -147,22 +147,21 @@ export const createReview = async (
   const { userId } = await auth();
   const userr = await getAuthUser();
 
-   const rawData = {
-      productid: formData.get("productId"),
-      authorname: formData.get("authorName") || userr.firstName || "user",
-      authorimageurl: formData.get("authorImageUrl") || userr.imageUrl || "",
-      rating: formData.get("rating"),
-      comment: formData.get("comment"),
-      clerkid: userId,
-    };
+  const rawData = {
+    productid: formData.get("productId"),
+    authorname: formData.get("authorName") || userr.firstName || "user",
+    authorimageurl: formData.get("authorImageUrl") || userr.imageUrl || "",
+    rating: formData.get("rating"),
+    comment: formData.get("comment"),
+    clerkid: userId,
+  };
 
-    const parsed = reviewSchema.parse(rawData);
+  const parsed = reviewSchema.parse(rawData);
 
-  
   if (!userId) return { message: "Not authenticated" };
   try {
-     const now = new Date().toISOString();
-   
+    const now = new Date().toISOString();
+
     const { error } = await supabase.from("Review").insert({
       productid: parsed.productid,
       authorname: parsed.authorname,
@@ -203,7 +202,9 @@ export const fetchProductReviews = async (productId: string) => {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from("Review")
-      .select("id, rating, comment, authorname, authorimageurl, createdat, clerkid,updatedat")
+      .select(
+        "id, rating, comment, authorname, authorimageurl, createdat, clerkid,updatedat"
+      )
       .eq("productid", productId);
 
     if (error) {
@@ -216,17 +217,35 @@ export const fetchProductReviews = async (productId: string) => {
     console.error("Unexpected error in fetchProductReviews:", error);
     throw new Error("Server error while fetching reviews");
   }
-
 };
 
 export const fetchProductReviewsByUser = async () => {
-    try {
+  try {
     const user = await getAuthUser(); // Throws if not logged in
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
       .from("Review")
-      .select("id, rating, comment, productid, authorname, authorimageurl, createdat, updatedat")
+      .select(
+                `
+          id,
+          rating,
+          comment,
+          authorname,
+          authorimageurl,
+          createdat,
+          updatedat,
+          product:products!Review_productid_fkey (
+            id,
+            name,
+            company,
+            description,
+            featured,
+            image,
+            price
+          )
+        `
+              )
       .eq("clerkid", user.id);
 
     if (error) {
@@ -243,7 +262,7 @@ export const fetchProductReviewsByUser = async () => {
 
 export const deleteProductReviews = async (reviewId: string) => {
   try {
-    const user = await getAuthUser(); 
+    const user = await getAuthUser();
     const supabase = await createSupabaseServerClient();
 
     const { data: existingReview, error: fetchError } = await supabase
@@ -251,31 +270,36 @@ export const deleteProductReviews = async (reviewId: string) => {
       .select("id, clerkid")
       .eq("id", reviewId)
       .single();
-    
+
     if (fetchError) {
-      console.error("Error fetching review:", JSON.stringify(fetchError, null, 2));
+      console.error(
+        "Error fetching review:",
+        JSON.stringify(fetchError, null, 2)
+      );
       throw new Error("Failed to verify review ownership");
     }
 
     if (!existingReview || existingReview.clerkid !== user.id) {
-     throw new Error("Not authorized to delete this review"); 
+      throw new Error("Not authorized to delete this review");
     }
 
-     // Perform the delete
+    // Perform the delete
     const { error: deleteError } = await supabase
       .from("Review")
       .delete()
       .eq("id", reviewId);
 
     if (deleteError) {
-      console.error("Error deleting review:", JSON.stringify(deleteError, null, 2));
+      console.error(
+        "Error deleting review:",
+        JSON.stringify(deleteError, null, 2)
+      );
       throw new Error("Failed to delete review");
     }
 
     return { success: true };
-
   } catch (error) {
-        console.error("Unexpected error in deleteProductReviews:", error);
+    console.error("Unexpected error in deleteProductReviews:", error);
     throw new Error("Server error while deleting review");
   }
 };
