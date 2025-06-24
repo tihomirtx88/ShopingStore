@@ -66,7 +66,7 @@ export const IconButton = ({
 
   return (
     <button
-      type="button"
+      type="submit"
       onClick={onClick}
       disabled={disabled}
       className="p-2 rounded hover:bg-muted transition"

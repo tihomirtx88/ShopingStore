@@ -1,7 +1,12 @@
-import React from 'react'
+import { deleteProductReviews } from "../../../utils/actions";
+import FormContainer from "../form/FormContainer";
+import { IconButton } from "../form/Buttons";
 
-export default function DeleteReview() {
+export default async function DeleteReview({ reviewId }: { reviewId: string }) {
+  const deleteReview = await deleteProductReviews.bind(null, reviewId);
   return (
-    <div>DeleteReview</div>
-  )
+    <FormContainer action={deleteReview}>
+      <IconButton actionType="delete" />
+    </FormContainer>
+  );
 }
