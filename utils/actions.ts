@@ -219,25 +219,19 @@ export const fetchProductReviews = async (productId: string) => {
 
 };
 
-export const fetchProductReviewsByUser = async ({
-  productId,
-}: {
-  productId: string;
-}) => {
-   try {
-
-    const user = await getAuthUser(); 
+export const fetchProductReviewsByUser = async () => {
+    try {
+    const user = await getAuthUser(); // Throws if not logged in
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
       .from("Review")
-      .select("id, rating, comment, authorname, authorimageurl, createdat, updatedat, clerkid")
-      .eq("productid", productId)
-      .eq("clerkid", user.id); 
+      .select("id, rating, comment, productid, authorname, authorimageurl, createdat, updatedat")
+      .eq("clerkid", user.id);
 
     if (error) {
-      console.error("Supabase error object:", JSON.stringify(error, null, 2));
-      throw new Error("Failed to fetch user-specific reviews");
+      console.error("Supabase error:", JSON.stringify(error, null, 2));
+      throw new Error("Failed to fetch reviews by user");
     }
 
     return data ?? [];
@@ -247,7 +241,44 @@ export const fetchProductReviewsByUser = async ({
   }
 };
 
-export const deleteProductReviews = async (productId: string) => {};
+export const deleteProductReviews = async (reviewId: string) => {
+  try {
+    const user = await getAuthUser(); 
+    const supabase = await createSupabaseServerClient();
+
+    const { data: existingReview, error: fetchError } = await supabase
+      .from("Review")
+      .select("id, clerkid")
+      .eq("id", reviewId)
+      .single();
+    
+    if (fetchError) {
+      console.error("Error fetching review:", JSON.stringify(fetchError, null, 2));
+      throw new Error("Failed to verify review ownership");
+    }
+
+    if (!existingReview || existingReview.clerkid !== user.id) {
+     throw new Error("Not authorized to delete this review"); 
+    }
+
+     // Perform the delete
+    const { error: deleteError } = await supabase
+      .from("Review")
+      .delete()
+      .eq("id", reviewId);
+
+    if (deleteError) {
+      console.error("Error deleting review:", JSON.stringify(deleteError, null, 2));
+      throw new Error("Failed to delete review");
+    }
+
+    return { success: true };
+
+  } catch (error) {
+        console.error("Unexpected error in deleteProductReviews:", error);
+    throw new Error("Server error while deleting review");
+  }
+};
 
 export const findExistingReview = async (productId: string) => {};
 

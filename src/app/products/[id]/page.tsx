@@ -24,7 +24,7 @@ export default async function SingleProductPage(props: Props) {
   const { name, company, price, image, description } = product;
   const dollarsAmount = formatCurrency(price);
 
-    const { userId } = auth();
+    const { userId } = await auth();
 
   return <section>
     <BreadCrumbps name={product.name}/>
