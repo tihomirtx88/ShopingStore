@@ -264,14 +264,12 @@ export const deleteProductReviews = async (reviewId: string) => {
   try {
     const supabase = await createSupabaseServerClient();
     const user = await getAuthUser();
-    console.log("Current user from Clerk:", user.id);
 
     const { data: existingReview, error: fetchError } = await supabase
       .from("Review")
       .select("id, clerkid")
       .eq("id", reviewId)
       .single();
-    console.log("Review clerkid:", existingReview?.clerkid);
 
     if (fetchError) {
       console.error(
