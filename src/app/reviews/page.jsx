@@ -1,5 +1,5 @@
 import SectionTitle from "@/components/global/SectionTitle";
-import { fetchProductReviewsByUser } from "../../../utils/actions";
+import { fetchProductReviewsByUser } from "../../../utils/review";
 import ReveiwCard from "@/components/reviews/ReveiwCard";
 import DeleteReview from "@/components/reviews/DeleteReview";
 
