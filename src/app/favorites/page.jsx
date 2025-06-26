@@ -1,5 +1,5 @@
 import SectionTitle from "@/components/global/SectionTitle";
-import { fetchUserFavroite } from "../../../utils/actions";
+import { fetchUserFavroite } from "../../../utils/favorite";
 import ProductsGrid from "@/components/products/ProductsGrid";
 
 async function FavoritesPage() {

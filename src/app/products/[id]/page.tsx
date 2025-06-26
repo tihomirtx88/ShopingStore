@@ -1,5 +1,6 @@
 import BreadCrumbps from "@/components/single-product/BreadCrumbps";
-import { fetchsingleProduct, findExistingReview } from "../../../../utils/actions";
+import { fetchsingleProduct } from "../../../../utils/product";
+import { findExistingReview } from "../../../../utils/review";
 import { formatCurrency } from "../../../../utils/format";
 import Image from "next/image";
 import FavoriteToggleButton from "@/components/products/FavoriteToggleButton";

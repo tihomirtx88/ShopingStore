@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import EmptyList from "@/components/global/EmptyList";
-import { fetchAdminProducts } from "../../../../utils/actions";
+import { fetchAdminProducts } from "../../../../utils/product";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { formatCurrency } from "../../../../utils/format";

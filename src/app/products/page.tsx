@@ -1,5 +1,5 @@
 import ProductsContainer from "@/components/products/ProductsContainer";
-import { fetchAllProducts } from "../../../utils/actions";
+import { fetchAllProducts } from "../../../utils/product";
 
 type Props = {
   searchParams: Promise<{ layout?: string; search?: string }>;

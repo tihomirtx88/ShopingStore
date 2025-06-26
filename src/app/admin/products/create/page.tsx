@@ -1,5 +1,5 @@
 import React from "react";
-import { createProduct } from "../../../../../utils/actions";
+import { createProduct } from "../../../../../utils/product";
 import { faker } from "@faker-js/faker";
 import FormInput from "@/components/form/FormInput";
 import FormContainer from "@/components/form/FormContainer";

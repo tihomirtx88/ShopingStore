@@ -1,5 +1,4 @@
-import React from 'react'
-import { fetchAdminProductDetails, updateImageAction, updateProductAction } from '../../../../../../utils/actions';
+import { fetchAdminProductDetails, updateImageAction, updateProductAction } from '../../../../../../utils/product';
 import FormContainer from '@/components/form/FormContainer';
 import FormInput from '@/components/form/FormInput';
 import PriceInput from '@/components/form/PriceInput';
