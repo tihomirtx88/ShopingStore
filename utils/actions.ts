@@ -304,7 +304,32 @@ export const deleteProductReviews = async (reviewId: string) => {
   }
 };
 
-export const findExistingReview = async (productId: string) => {};
+export const findExistingReview = async (
+  userId: string,
+  productId: string
+): Promise<any | null> => {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error } = await supabase
+      .from("Review")
+      .select("*")
+      .eq("clerkid", userId)
+      .eq("productid", productId)
+      .single(); 
+
+    if (error && error.code !== "PGRST116") {
+      console.error("Supabase error:", error.message);
+      throw new Error("Error fetching review");
+    }
+
+    return data ?? null;
+    
+  } catch (err) {
+    console.error("Unexpected error in findExistingReview:", err);
+    return null;
+  }
+};
 
 export const fetchProductRating = async (productId: string) => {
   const supabase = await createSupabaseServerClient();
