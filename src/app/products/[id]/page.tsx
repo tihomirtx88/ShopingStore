@@ -10,7 +10,6 @@ import ShareButton from "@/components/single-product/ShareButton";
 import SubmitReview from "@/components/reviews/SubmitReview";
 import ProductReviews from "@/components/reviews/ProductReviews";
 import { auth } from "@clerk/nextjs/server";
-// import ProductReviews from "@/components/reviews/ProductReviews";
 
 type Props = {
   params: Promise<{ id: string }>;
