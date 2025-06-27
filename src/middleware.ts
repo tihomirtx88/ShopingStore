@@ -20,19 +20,16 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (isAdminRoute(req)) {
     if (!userId) {
-      console.log("🔐 Redirecting unauthenticated admin to /sign-in");
       return NextResponse.redirect(new URL("/sign-in", req.url));
     }
 
     if (!isAdminUser) {
-      console.log("⛔ Redirecting non-admin to home");
       return NextResponse.redirect(new URL("/", req.url));
     }
 
     return NextResponse.next();
   }
   if (!userId) {
-    console.log("🔐 Redirecting unauthenticated user to /sign-in");
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 

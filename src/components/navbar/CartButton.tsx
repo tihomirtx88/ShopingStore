@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { FaCartArrowDown } from "react-icons/fa";
+import { fetchCartItems } from "../../../utils/cart";
 
 export default async function CartButton() {
-  //temp
-  const numItemsInCart = 9;
+  const numItemsInCart = await fetchCartItems();
   return (
     <Button
       asChild
