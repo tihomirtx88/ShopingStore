@@ -2,12 +2,11 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { getAuthUser } from "./auth";
-import { supabaseClient } from "./shared";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "./supabase-server";
 
 export const toggleFavoriteAction = async (_: unknown, formData: FormData) => {
-  const supabase = await supabaseClient();
+  const supabase = await createSupabaseServerClient();
   const { userId } = await auth();
   if (!userId) return { message: "Not authenticated" };
 
