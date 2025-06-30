@@ -170,7 +170,7 @@ export const updateCart = async (cart: Cart) => {
   // 1. Get cart items with product info
   const { data: cartItems, error: itemsError } = await supabase
     .from("CartItem")
-    .select("*")
+    .select("*, product:products(*)")
     .eq("cartId", cart.id);
 
   if (itemsError) {

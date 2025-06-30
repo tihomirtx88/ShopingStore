@@ -27,7 +27,7 @@ async function Cart() {
         </div>
         <div className="lg:col-span-4">
           <CartTotals
-          //  cart={currentCart} 
+           cart={updatedCart} 
            />
         </div>
       </div>
