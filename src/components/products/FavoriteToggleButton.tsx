@@ -8,7 +8,6 @@ export default async function FavoriteToggleButton( { productId } :{productId:st
     const { userId } = await auth();
     if(!userId) return <CardSignInbutton/>;
     const favorite = await fetchFavroiteId({ productId });
-    console.log(favorite, 'favoriteeeeeeee');
     
     const favoriteId = favorite?.id ?? null;
 

@@ -2,6 +2,8 @@ import SectionTitle from "@/components/global/SectionTitle";
 import { fetchUserFavroite } from "../../../utils/favorite";
 import ProductsGrid from "@/components/products/ProductsGrid";
 
+export const dynamic = "force-dynamic";
+
 async function FavoritesPage() {
   const favorites = await fetchUserFavroite();
   if(favorites.length === 0) return <SectionTitle text="You not have favroites yet"/>

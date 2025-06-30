@@ -9,6 +9,8 @@ import TextArea from "@/components/form/TextArea";
 import CheckBox from "@/components/form/CheckBox";
 import Buttons from "@/components/form/Buttons";
 
+export const dynamic = "force-dynamic";
+
 export default function CreateProductPage() {
   const name = faker.commerce.productName();
   const company = faker.company.name();

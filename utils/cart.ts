@@ -59,7 +59,6 @@ const fetchProduct = async (productId: string) => {
     .select("*")
     .eq("id", productId)
     .single();
-  console.log(error);
 
   if (!data) {
     throw new Error("Product not exist");
@@ -68,7 +67,7 @@ const fetchProduct = async (productId: string) => {
   return data;
 };
 
-const fetchOrCreateCart = async ({
+export const fetchOrCreateCart = async ({
   userId,
   errorOrFailer = false,
 }: {
@@ -165,7 +164,7 @@ const updatePrCreateCartItem = async ({
   }
 };
 
-const updateCart = async (cart: Cart) => {
+export const updateCart = async (cart: Cart) => {
   const supabase = await createSupabaseServerClient();
 
   // 1. Get cart items with product info
@@ -211,7 +210,7 @@ const updateCart = async (cart: Cart) => {
     throw new Error(`Failed to update cart totals: ${updateError.message}`);
   }
 
-  return updatedCart;
+  return {cartItems, updatedCart};
 };
 
 export const addToCartAction = async (
