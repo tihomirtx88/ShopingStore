@@ -3,6 +3,8 @@ import { fetchProductReviewsByUser } from "../../../utils/review";
 import ReveiwCard from "@/components/reviews/ReveiwCard";
 import DeleteReview from "@/components/reviews/DeleteReview";
 
+export const dynamic = "force-dynamic";
+
 async function ReviewsPage() {
   const reviews = await fetchProductReviewsByUser();
 

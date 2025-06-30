@@ -506,8 +506,6 @@ export const updateImageAction = async (
         upsert: true,
       });
 
-    console.log(uploadData);
-
     if (uploadError) {
       console.error("Upload error", uploadError.message);
       return { message: "Image upload failed" };

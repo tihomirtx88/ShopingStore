@@ -8,6 +8,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Next Storefront",
   description: "A nifty store built with Next.js",
