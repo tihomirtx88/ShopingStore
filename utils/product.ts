@@ -165,8 +165,6 @@ export const deleteProduct = async (productId: string) => {
   }
 };
 
-
-
 export const fetchAdminProducts = async () => {
   try {
     const adminUser = await getAdminUser();

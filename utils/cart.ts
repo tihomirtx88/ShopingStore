@@ -1,6 +1,21 @@
+"use server";
+
 import { redirect } from "next/navigation";
 import { getAuthUser } from "./auth";
 import { createSupabaseServerClient } from "./supabase-server";
+
+import { randomUUID } from "crypto";
+
+export type Cart = {
+  id: string;
+  clerkid: string;
+  numItemsInCart: number;
+  cartTotal: number;
+  shipping: number;
+  tax: number;
+  taxRate: number;
+  orderTotal: number;
+};
 
 export const fetchCartItems = async () => {
   try {
@@ -44,6 +59,7 @@ const fetchProduct = async (productId: string) => {
     .select("*")
     .eq("id", productId)
     .single();
+  console.log(error);
 
   if (!data) {
     throw new Error("Product not exist");
@@ -63,8 +79,8 @@ const fetchOrCreateCart = async ({
 
   // 1. Try to fetch the cart
   const { data: carts, error: fetchError } = await supabase
-    .from("cart")
-    .select("*, cartItems(*)")
+    .from("Cart")
+    .select("*")
     .eq("clerkid", userId)
     .limit(1)
     .maybeSingle();
@@ -83,10 +99,16 @@ const fetchOrCreateCart = async ({
     throw new Error("Cart not found");
   }
   // 4. Create new cart
+  const cartId = crypto.randomUUID();
+  const now = new Date().toISOString();
   const { data: newCart, error: createError } = await supabase
-    .from("cart")
-    .insert({ clerkid: userId })
-    .select("*, cartItems(*)")
+    .from("Cart")
+    .insert({
+    id:cartId,    
+    clerkid: userId,
+    createdAt: now,
+    updatedAt: now, })
+    .select("*")
     .maybeSingle();
 
   if (createError) {
@@ -96,19 +118,124 @@ const fetchOrCreateCart = async ({
   return newCart;
 };
 
+const updatePrCreateCartItem = async ({
+  productId,
+  cartId,
+  amount,
+}: {
+  productId: string;
+  cartId: string;
+  amount: number;
+}) => {
+  const supabase = await createSupabaseServerClient();
+
+  // Check if the cart item already exists
+  const { data: existingItem, error: fetchError } = await supabase
+    .from("CartItem")
+    .select("*")
+    .eq("productId", productId)
+    .eq("cartId", cartId)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw new Error(`Failed to fetch cart item: ${fetchError.message}`);
+  }
+
+  if (existingItem) {
+    //If it exists, update the amount
+    const { error: updateError } = await supabase
+      .from("CartItem")
+      .update({ amount: existingItem.amount + amount })
+      .eq("id", existingItem.id);
+
+    if (updateError) {
+      throw new Error(`Failed to update cart item: ${updateError.message}`);
+    }
+  } else {
+    //If not, insert a new cart item
+     const now = new Date().toISOString();
+    const { error: insertError } = await supabase
+      .from("CartItem")
+      .insert({  id: randomUUID(), amount, cartId, productId, createdAt: now,
+    updatedAt: now, });
+
+    if (insertError) {
+      throw new Error(`Failed to insert new cart item: ${insertError.message}`);
+    }
+  }
+};
+
+const updateCart = async (cart: Cart) => {
+  const supabase = await createSupabaseServerClient();
+
+  // 1. Get cart items with product info
+  const { data: cartItems, error: itemsError } = await supabase
+    .from("CartItem")
+    .select("*")
+    .eq("cartId", cart.id);
+
+  if (itemsError) {
+    throw new Error(`Failed to fetch cart items: ${itemsError.message}`);
+  }
+
+  if (!cartItems || cartItems.length === 0) {
+    return cart;
+  }
+  // 2. Compute totals
+  let numItemsInCart = 0;
+  let cartTotal = 0;
+
+  for (const item of cartItems) {
+    numItemsInCart += item.amount;
+    cartTotal += item.amount * (item.product?.price || 0);
+  }
+
+  const tax = cart.taxRate * cartTotal;
+  const shipping = cartTotal > 0 ? cart.shipping : 0;
+  const orderTotal = cartTotal + tax + shipping;
+
+  // 3. Update cart
+  const { data: updatedCart, error: updateError } = await supabase
+    .from("Cart")
+    .update({
+      numItemsInCart,
+      cartTotal,
+      tax,
+      orderTotal,
+    })
+    .eq("id", cart.id)
+    .select("*")
+    .maybeSingle();
+
+  if (updateError) {
+    throw new Error(`Failed to update cart totals: ${updateError.message}`);
+  }
+
+  return updatedCart;
+};
+
 export const addToCartAction = async (
   prevState: unknown,
   formData: FormData
 ) => {
   const user = await getAuthUser();
-  const supabase = await createSupabaseServerClient();
   try {
     const productId = formData.get("productId") as string;
     const amount = Number(formData.get("amount"));
+
     await fetchProduct(productId);
-    const cart = await fetchOrCreateCar({ userId: user.id });
+    const cart = await fetchOrCreateCart({ userId: user.id });
+
+    await updatePrCreateCartItem({ productId, cartId: cart.id, amount });
+
+    await updateCart(cart);
   } catch (error) {
-    console.error("Unexpected error in addCartAction:", error);
+    console.error("Unexpected error in addCartAction:", {
+      error,
+      productId: formData.get("productId"),
+      amount: formData.get("amount"),
+      userId: user?.id,
+    });
     throw new Error("Server error while adding cart items");
   }
   redirect("/cart");
