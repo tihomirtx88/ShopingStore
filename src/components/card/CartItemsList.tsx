@@ -3,6 +3,7 @@
 import { CartItemWithProduct } from "../../../utils/types";
 import { Card } from "../ui/card";
 import { FirstColumn, FourthColumn, SecondColumn } from "./CartItemColumns";
+import TirthColumns from "./TirthColumns";
 
 
 
@@ -23,6 +24,7 @@ const CartItemsList = ({ cartItems }: { cartItems: CartItemWithProduct[] }) => {
           >
             <FirstColumn image={image} name={name} />
             <SecondColumn name={name} company={company} productId={productId} />
+            <TirthColumns id={id} quantity={amount} />
             <FourthColumn price={price} />
           </Card>
         );
