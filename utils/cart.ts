@@ -5,6 +5,7 @@ import { getAuthUser } from "./auth";
 import { createSupabaseServerClient } from "./supabase-server";
 
 import { randomUUID } from "crypto";
+import { revalidatePath } from "next/cache";
 
 export type Cart = {
   id: string;
@@ -103,10 +104,11 @@ export const fetchOrCreateCart = async ({
   const { data: newCart, error: createError } = await supabase
     .from("Cart")
     .insert({
-    id:cartId,    
-    clerkid: userId,
-    createdAt: now,
-    updatedAt: now, })
+      id: cartId,
+      clerkid: userId,
+      createdAt: now,
+      updatedAt: now,
+    })
     .select("*")
     .maybeSingle();
 
@@ -152,11 +154,15 @@ const updatePrCreateCartItem = async ({
     }
   } else {
     //If not, insert a new cart item
-     const now = new Date().toISOString();
-    const { error: insertError } = await supabase
-      .from("CartItem")
-      .insert({  id: randomUUID(), amount, cartId, productId, createdAt: now,
-    updatedAt: now, });
+    const now = new Date().toISOString();
+    const { error: insertError } = await supabase.from("CartItem").insert({
+      id: randomUUID(),
+      amount,
+      cartId,
+      productId,
+      createdAt: now,
+      updatedAt: now,
+    });
 
     if (insertError) {
       throw new Error(`Failed to insert new cart item: ${insertError.message}`);
@@ -210,7 +216,7 @@ export const updateCart = async (cart: Cart) => {
     throw new Error(`Failed to update cart totals: ${updateError.message}`);
   }
 
-  return {cartItems, updatedCart};
+  return { cartItems, updatedCart };
 };
 
 export const addToCartAction = async (
@@ -247,10 +253,53 @@ export const updateCartItemAction = async ({
   amount: number;
   cartItemId: string;
 }) => {
-  return{message: 'success'}
+  return { message: "success" };
 };
 
-export const removeCartItemAction = async (prevState: unknown,
-  formData: FormData) => {
+export const removeCartItemAction = async (
+  prevState: unknown,
+  formData: FormData
+) => {
+  try {
+    const cartItemId = formData.get("cartItemId") as string;
 
+    if (!cartItemId) {
+      throw new Error("Missing cart item ID.");
+    }
+
+    const user = await getAuthUser();
+    const cart = await fetchOrCreateCart({
+      userId: user.id,
+      errorOrFailer: true,
+    });
+
+    const supabase = await createSupabaseServerClient();
+
+    // Remove the cart item
+    const { error: deleteError } = await supabase
+      .from("CartItem")
+      .delete()
+      .eq("id", cartItemId)
+      .eq("cartId", cart.id);
+
+    if (deleteError) {
+      throw new Error(`Failed to delete cart item: ${deleteError.message}`);
+    }
+
+    // Recalculate cart totals
+    await updateCart(cart);
+
+    // Revalidate cart page
+    revalidatePath("/cart");
+
+    return { message: "Cart item removed successfully." };
+  } catch (error) {
+    console.error("Error in removeCartItemAction:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to remove item from cart.";
+
+    return { message: errorMessage };
+  }
 };
