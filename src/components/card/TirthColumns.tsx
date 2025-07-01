@@ -10,6 +10,8 @@ import Buttons from "../form/Buttons";
 const TirthColumns = ({ quantity, id }: { quantity: number; id: string }) => {
   const [amount, setAmount] = useState(quantity);
   const [isLoading, setIsLoading] = useState(false);
+  console.log(isLoading);
+  
 
   const handleAmountChange = async (value: number) => {
     setIsLoading(true);
