@@ -239,3 +239,18 @@ export const addToCartAction = async (
   }
   redirect("/cart");
 };
+
+export const updateCartItemAction = async ({
+  amount,
+  cartItemId,
+}: {
+  amount: number;
+  cartItemId: string;
+}) => {
+  return{message: 'success'}
+};
+
+export const removeCartItemAction = async (prevState: unknown,
+  formData: FormData) => {
+
+};
