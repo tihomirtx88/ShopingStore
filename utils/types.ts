@@ -20,3 +20,17 @@ export type CartState = {
   tax: number;
   orderTotal: number;
 };
+
+export type Product = {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  company: string;
+};
+
+export type CartItemWithProduct = {
+  id: string;
+  amount: number;
+  product: Product;
+};
