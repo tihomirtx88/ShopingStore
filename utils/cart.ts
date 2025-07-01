@@ -253,7 +253,41 @@ export const updateCartItemAction = async ({
   amount: number;
   cartItemId: string;
 }) => {
-  return { message: "success" };
+  try {
+    const user = await getAuthUser();
+    const cart = await fetchOrCreateCart({
+      userId: user.id,
+      errorOrFailer: true,
+    });
+
+    const supabase = await createSupabaseServerClient();
+
+    // Update the cart item
+    const { error: updateError } = await supabase
+      .from("CartItem")
+      .update({ amount, updatedAt: new Date().toISOString() })
+      .eq("id", cartItemId)
+      .eq("cartId", cart.id);
+
+    if (updateError) {
+      throw new Error(`Failed to update cart item: ${updateError.message}`);
+    }
+
+     // Recalculate cart totals
+    await updateCart(cart);
+
+    // Revalidate cart page
+    revalidatePath("/cart");
+
+  } catch (error) {
+    console.error("Error in removeCartItemAction:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to remove item from cart.";
+
+    return { message: errorMessage };
+  }
 };
 
 export const removeCartItemAction = async (
