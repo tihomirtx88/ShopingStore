@@ -295,7 +295,7 @@ export const removeCartItemAction = async (
   formData: FormData
 ) => {
   try {
-    const cartItemId = formData.get("cartItemId") as string;
+    const cartItemId = formData.get("id") as string;
 
     if (!cartItemId) {
       throw new Error("Missing cart item ID.");

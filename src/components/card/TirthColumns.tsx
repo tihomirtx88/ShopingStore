@@ -7,14 +7,6 @@ import SelectProductAmount, { Mode } from "../single-product/SelectProductamount
 import FormContainer from "../form/FormContainer";
 import Buttons from "../form/Buttons";
 
-// import { useState } from 'react';
-// import SelectProductAmount from '../single-product/SelectProductAmount';
-// import { Mode } from '../single-product/SelectProductAmount';
-// import FormContainer from '../form/FormContainer';
-// import { SubmitButton } from '../form/Buttons';
-// import { removeCartItemAction, updateCartItemAction } from '@/utils/actions';
-// import { useToast } from '../ui/use-toast';
-
 const TirthColumns = ({ quantity, id }: { quantity: number; id: string }) => {
   const [amount, setAmount] = useState(quantity);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +19,7 @@ const TirthColumns = ({ quantity, id }: { quantity: number; id: string }) => {
       cartItemId: id,
     });
     setAmount(value);
-    toast(result.message);
+    toast(result?.message);
     setIsLoading(false);
   };
 
