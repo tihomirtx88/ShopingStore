@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/table';
 import { fetchUserOrders } from '../../../utils/order';
 import { formatCurrency, formatDate } from '../../../utils/format';
+import SectionTitle from '@/components/global/SectionTitle';
 
 async function OrdersPage() {
   const orders = await fetchUserOrders();
