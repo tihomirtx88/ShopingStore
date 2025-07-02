@@ -3,6 +3,10 @@ export const formatCurrency = (amount: number | null) => {
     return new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(value);
 };
 
-export const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {year: 'numeric', month: 'long', day: 'numeric'}).format(date);
+export const formatDate = (date: string | number | Date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date(date));
 };
