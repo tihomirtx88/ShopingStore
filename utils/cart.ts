@@ -184,7 +184,7 @@ export const updateCart = async (cart: Cart) => {
   }
 
   if (!cartItems || cartItems.length === 0) {
-    return cart;
+    return { cartItems: [], updatedCart: cart };
   }
   // 2. Compute totals
   let numItemsInCart = 0;
