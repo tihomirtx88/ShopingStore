@@ -3,8 +3,68 @@
 import { redirect } from "next/navigation";
 import { getAuthUser } from "./auth";
 import { createSupabaseServerClient } from "./supabase-server";
+import { fetchOrCreateCart } from "./cart";
 
-export const createOrderAction = async ( prevState: unknown,
-  formData: FormData): Promise<{ message: string }>=> {
-   return {message: 'create order'}
+export const createOrderAction = async (
+  prevState: unknown,
+  formData: FormData
+): Promise<{ message: string }> => {
+  const user = await getAuthUser();
+
+  let orderId: string | null = null;
+  let cartId: string | null = null;
+
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const cart = await fetchOrCreateCart({
+      userId: user.id,
+      errorOrFailer: true,
+    });
+
+    cartId = cart.id;
+
+   // 1. Delete previous unpaid orders for this user
+    const { error: deleteError } = await supabase
+      .from("Order")
+      .delete()
+      .eq("clerkId", user.id)
+      .eq("isPaid", false);
+
+    if (deleteError) {
+      throw new Error("Failed to delete previous unpaid orders.");
+    }
+
+    // 2. Create new order
+    const { data: orderData, error: insertError } = await supabase
+      .from("Order")
+      .insert([
+        {
+          clerkId: user.id,
+          products: cart.numItemsInCart,
+          orderTotal: cart.orderTotal,
+          tax: cart.tax,
+          shipping: cart.shipping,
+          email: user.emailAddresses[0].emailAddress,
+          isPaid: false,
+          createdAt: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (insertError || !orderData) {
+      throw new Error("Failed to create order.");
+    }
+
+    orderId = orderData.id;
+    
+  } catch (error) {
+    console.error("Order creation failed:", error);
+    return { message: "Something went wrong while creating order." };
+  }
+  
+  redirect(`/checkout?orderId=${orderId}&cartId=${cartId}`);
 };
+
+export const fetchUserOrders = async () => {};
