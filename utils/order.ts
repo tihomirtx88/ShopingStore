@@ -36,10 +36,12 @@ export const createOrderAction = async (
     }
 
     // 2. Create new order
-    const { data: orderData, error: insertError } = await supabase
+    const orderIdd = crypto.randomUUID();
+    const { data: orderDataArray, error: insertError } = await supabase
       .from("Order")
       .insert([
         {
+          id: orderIdd,
           clerkId: user.id,
           products: cart.numItemsInCart,
           orderTotal: cart.orderTotal,
@@ -48,13 +50,17 @@ export const createOrderAction = async (
           email: user.emailAddresses[0].emailAddress,
           isPaid: false,
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         },
       ])
       .select()
-      .single();
+      
+      const orderData = orderDataArray?.[0];
 
     if (insertError || !orderData) {
-      throw new Error("Failed to create order.");
+      console.error("Insert error:", insertError);
+      console.error("Returned data:", orderData);
+      throw new Error(`Failed to create order: ${insertError?.message || "Unknown error"}`);
     }
 
     orderId = orderData.id;
