@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getAuthUser } from "./auth";
+import { getAdminUser, getAuthUser } from "./auth";
 import { createSupabaseServerClient } from "./supabase-server";
 import { fetchOrCreateCart } from "./cart";
 
@@ -79,6 +79,25 @@ export const fetchUserOrders = async () => {
 
   if (error) {
     console.error("Failed to fetch orders:", error);
+    return [];
+  }
+
+  return orders;
+};
+
+export const fetchAdminOrders = async () => {
+  await getAdminUser();
+
+  const supabase = await createSupabaseServerClient();
+
+  const { data: orders, error } = await supabase
+    .from("Order")
+    .select("*")
+    .eq("isPaid", true)
+    .order("createdAt", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch admin orders:", error);
     return [];
   }
 
