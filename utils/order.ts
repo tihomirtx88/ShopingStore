@@ -24,7 +24,7 @@ export const createOrderAction = async (
 
     cartId = cart.id;
 
-   // 1. Delete previous unpaid orders for this user
+    // 1. Delete previous unpaid orders for this user
     const { error: deleteError } = await supabase
       .from("Order")
       .delete()
@@ -58,13 +58,29 @@ export const createOrderAction = async (
     }
 
     orderId = orderData.id;
-    
   } catch (error) {
     console.error("Order creation failed:", error);
     return { message: "Something went wrong while creating order." };
   }
-  
+
   redirect(`/checkout?orderId=${orderId}&cartId=${cartId}`);
 };
 
-export const fetchUserOrders = async () => {};
+export const fetchUserOrders = async () => {
+  const user = await getAuthUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data: orders, error } = await supabase
+    .from("Order")
+    .select("*")
+    .eq("clerkId", user.id)
+    .eq("isPaid", true)
+    .order("createdAt", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch orders:", error);
+    return [];
+  }
+
+  return orders;
+};
