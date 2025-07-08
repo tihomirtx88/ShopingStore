@@ -1,11 +1,16 @@
-//
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-// import { type NextRequest } from 'next/server';
-// import db from '@/utils/db';
 
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { createSupabaseServerClient } from "../../../../utils/supabase-server";
+
+interface CartItem {
+  amount: number;
+  product: {
+    name: string;
+    image: string;
+    price: number;
+  };
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
@@ -54,7 +59,7 @@ export const POST = async (req: NextRequest) => {
   }
 
   // 3. Build Stripe line_items from cart
-  const line_items = cart.cartItems.map((item: any) => ({
+  const line_items = cart.cartItems.map((item: CartItem) => ({
     quantity: item.amount,
     price_data: {
       currency: "usd",

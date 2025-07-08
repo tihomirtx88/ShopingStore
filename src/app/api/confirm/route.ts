@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { createSupabaseServerClient } from "../../../../utils/supabase-server";
@@ -52,7 +51,12 @@ export const GET = async (req: NextRequest) => {
       return Response.json({ error: "Failed to delete cart" }, { status: 500 });
     }
 
-    redirect("/orders");
+      return new Response(null, {
+      status: 302,
+      headers: {
+        Location: "/orders",
+      },
+    });
     
   } catch (error) {
     console.error("Confirm error:", error);
