@@ -254,7 +254,7 @@ export const updateProductAction = async (
     const supabase = await createSupabaseServerClient();
     const { data: product, error } = await supabase
       .from("products")
-      .select("clerkid")
+      .select("clerkId")
       .eq("id", id)
       .single();
 
@@ -263,7 +263,7 @@ export const updateProductAction = async (
       return { message: "Product not found" };
     }
 
-    const isOwner = product.clerkid === user.id;
+    const isOwner = product.clerkId === user.id;
     if (!isAdmin && !isOwner) {
       return { message: "Unauthorized" };
     }

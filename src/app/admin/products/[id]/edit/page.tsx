@@ -16,6 +16,8 @@ export const dynamic = "force-dynamic";
 
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
+  console.log(id, 'from single id test');
+  
   const product = await fetchAdminProductDetails(id);
   const { name, company, description, featured, price} = product;
   return (
